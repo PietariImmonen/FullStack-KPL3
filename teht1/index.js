@@ -5,6 +5,8 @@ const app = express()
 
 app.use(express.json())
 
+morgan.token("body", (req) => JSON.stringify(req.body))
+
 let persons = [
     
           { 
@@ -67,7 +69,7 @@ const generateId = () => {
   return Math.floor(Math.random() * 1000000);
 }
 
-app.post('/api/persons', morgan("tiny"), (request, response) => {
+app.post('/api/persons', morgan(":body"), (request, response) => {
   const body = request.body
   console.log(body)
 

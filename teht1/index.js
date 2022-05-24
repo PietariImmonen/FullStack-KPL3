@@ -1,4 +1,5 @@
 const express = require('express')
+const morgan = require("morgan")
 const app = express()
 
 
@@ -30,21 +31,21 @@ let persons = [
       
 ]
 
-app.get('/', (req, res) => {
+app.get('/', morgan("tiny"), (req, res) => {
   res.send('<h1>Hello World!</h1>')
 })
 
-app.get('/api/persons', (req, res) => {
+app.get('/api/persons', morgan("tiny"), (req, res) => {
   res.json(persons)
 })
 
-app.get('/info', (req, res) => {
+app.get('/info', morgan("tiny"), (req, res) => {
     const length = persons.length
     const time = new Date()
     res.json(`This list has ${length} persons and the time was ${time}`)
 })
 
-app.get('/api/persons/:id', (request, response) => {
+app.get('/api/persons/:id', morgan("tiny"), (request, response) => {
     const id = Number(request.params.id)
     const person = persons.find(person => person.id === id)
 
@@ -55,7 +56,7 @@ app.get('/api/persons/:id', (request, response) => {
     }
 })
 
-app.delete('/api/persons/:id', (request, response) => {
+app.delete('/api/persons/:id', morgan("tiny"), (request, response) => {
     const id = Number(request.params.id)
     persons = persons.filter(person => person.id !== id)
   
@@ -66,7 +67,7 @@ const generateId = () => {
   return Math.floor(Math.random() * 1000000);
 }
 
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', morgan("tiny"), (request, response) => {
   const body = request.body
   console.log(body)
 

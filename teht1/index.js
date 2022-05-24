@@ -2,8 +2,7 @@ const express = require('express')
 const app = express()
 
 let persons = [
-    {
-        "persons":[
+    
           { 
             "name": "Arto Hellas", 
             "number": "040-123456",
@@ -24,8 +23,8 @@ let persons = [
             "number": "39-23-6423122",
             "id": 4
           }
-        ]
-      }
+        
+      
 ]
 
 app.get('/', (req, res) => {
@@ -35,6 +34,12 @@ app.get('/', (req, res) => {
 app.get('/api/persons', (req, res) => {
   res.json(persons)
 })
+
+app.get('/info', (req, res) => {
+    const length = persons.length
+    const time = new Date()
+    res.json(`This list has ${length} persons and the time was ${time}`)
+  })
 
 const PORT = 3001
 app.listen(PORT, () => {

@@ -15,10 +15,11 @@ app.get('/', morgan("tiny"), (req, res) => {
   res.send('<h1>Hello World!</h1>')
 })
 
-app.get('/api/persons', morgan("tiny"), (req, res) => {
+app.get('/api/persons', morgan("tiny"), (req, res, next) => {
     Person.find({}).then(pers => {
       res.json(pers)
     })
+    .catch(error => next(error))
 })
 
 app.get('/info', morgan("tiny"), (req, res) => {
@@ -27,15 +28,16 @@ app.get('/info', morgan("tiny"), (req, res) => {
     res.json(`This list has ${length} persons and the time was ${time}`)
 })
 
-app.get('/api/persons/:id', morgan("tiny"), (request, response) => {
-    const id = Number(request.params.id)
-    const person = persons.find(person => person.id === id)
-
-    if(person) {
-        response.json(person)
-    } else {
+app.get('/api/persons/:id', morgan("tiny"), (request, response, next) => {
+    Person.findById(request.params.id)
+    .then(pers => {
+      if (pers) {
+        response.json(pers)
+      } else {
         response.status(404).end()
-    }
+      }
+    })
+    .catch(error => next(error))
 })
 
 
@@ -44,9 +46,10 @@ app.delete('/api/persons/:id', (request, response) => {
     .then(result => {
       response.status(204).end()
     })
+    .catch(error => next(error))
 })
 
-app.post('/api/persons', morgan(":body"), (request, response) => {
+app.post('/api/persons', morgan(":body"), (request, response, next) => {
   const body = request.body
   console.log(body)
 
@@ -71,7 +74,18 @@ app.post('/api/persons', morgan(":body"), (request, response) => {
     person.save().then(savedPerson => {
     response.json(savedPerson)
   })
+  .catch(error => next(error))
 })
+
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message)
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformatted id' })
+  }
+  next(error)
+}
+
+app.use(errorHandler)
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {

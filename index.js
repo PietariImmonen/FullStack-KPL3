@@ -38,15 +38,13 @@ app.get('/api/persons/:id', morgan("tiny"), (request, response) => {
     }
 })
 
-app.delete('/api/persons/:id', morgan("tiny"), (request, response) => {
-    Person.findById(request.params.id).then(pers => {
-      response.json(pers)
+
+app.delete('/api/persons/:id', (request, response) => {
+  Person.findByIdAndRemove(request.params.id)
+    .then(result => {
+      response.status(204).end()
     })
 })
-
-const generateId = () => {
-  return Math.floor(Math.random() * 1000000);
-}
 
 app.post('/api/persons', morgan(":body"), (request, response) => {
   const body = request.body

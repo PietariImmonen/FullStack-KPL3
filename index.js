@@ -23,9 +23,10 @@ app.get('/api/persons', morgan("tiny"), (req, res, next) => {
 })
 
 app.get('/info', morgan("tiny"), (req, res) => {
-    const length = persons.length
-    const time = new Date()
-    res.json(`This list has ${length} persons and the time was ${time}`)
+  const time = new Date()
+    Person.find({}).then(pers => {
+      res.json(`This list has ${pers.length} persons and the time was ${time}`)
+    })
 })
 
 app.get('/api/persons/:id', morgan("tiny"), (request, response, next) => {

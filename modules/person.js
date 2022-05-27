@@ -13,7 +13,14 @@ mongoose.connect(url)
 
 const personSchema = new mongoose.Schema({
   name: {type: String, minlength: 3, required: true,},
-  number: {type: String, required: true,},
+  number: {
+    type: String,
+    validate: {
+      validator: function(i) {
+        return /\d{2}-\d{7}/.test(i) || /\d{3}-\d{7}/.test(i);
+      },
+    }
+  }
 })
 
 personSchema.set('toJSON', {

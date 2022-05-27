@@ -1,6 +1,6 @@
 require('dotenv').config()
 const express = require('express')
-const morgan = require("morgan")
+const morgan = require('morgan')
 const app = express()
 const Person = require('./modules/person')
 
@@ -8,29 +8,29 @@ const Person = require('./modules/person')
 app.use(express.json())
 app.use(express.static('build'))
 
-morgan.token("body", (req) => JSON.stringify(req.body))
+morgan.token('body', (req) => JSON.stringify(req.body))
 
 
-app.get('/', morgan("tiny"), (req, res) => {
+app.get('/', morgan('tiny'), (req, res) => {
   res.send('<h1>Hello World!</h1>')
 })
 
-app.get('/api/persons', morgan("tiny"), (req, res, next) => {
-    Person.find({}).then(pers => {
-      res.json(pers)
-    })
+app.get('/api/persons', morgan('tiny'), (req, res, next) => {
+  Person.find({}).then(pers => {
+    res.json(pers)
+  })
     .catch(error => next(error))
 })
 
-app.get('/info', morgan("tiny"), (req, res) => {
+app.get('/info', morgan('tiny'), (req, res) => {
   const time = new Date()
-    Person.find({}).then(pers => {
-      res.json(`This list has ${pers.length} persons and the time was ${time}`)
-    })
+  Person.find({}).then(pers => {
+    res.json(`This list has ${pers.length} persons and the time was ${time}`)
+  })
 })
 
-app.get('/api/persons/:id', morgan("tiny"), (request, response, next) => {
-    Person.findById(request.params.id)
+app.get('/api/persons/:id', morgan('tiny'), (request, response, next) => {
+  Person.findById(request.params.id)
     .then(pers => {
       if (pers) {
         response.json(pers)
@@ -42,40 +42,39 @@ app.get('/api/persons/:id', morgan("tiny"), (request, response, next) => {
 })
 
 
-app.delete('/api/persons/:id', (request, response) => {
+app.delete('/api/persons/:id', (request, response, next) => {
   Person.findByIdAndRemove(request.params.id)
-    .then(result => {
+    .then(() => {
       response.status(204).end()
     })
     .catch(error => next(error))
 })
 
-app.post('/api/persons', morgan(":body"), (request, response, next) => {
+app.post('/api/persons', morgan(':body'), (request, response, next) => {
   const body = request.body
   console.log(body)
 
   if (!body.name) {
-    return response.status(400).json({ 
-      error: 'name missing' 
+    return response.status(400).json({
+      error: 'name missing'
     })
   }
 
   if (!body.number) {
-    return response.status(400).json({ 
-      error: 'number missing' 
+    return response.status(400).json({
+      error: 'number missing'
     })
   }
-
   const person = new Person({
     name: body.name,
     number: body.number,
   })
   console.log(person)
 
-    person.save().then(savedPerson => {
+  person.save().then(savedPerson => {
     response.json(savedPerson)
   })
-  .catch(error => next(error))
+    .catch(error => next(error))
 })
 
 app.put('/api/persons/:id', (request, response, next) => {
@@ -83,9 +82,8 @@ app.put('/api/persons/:id', (request, response, next) => {
 
   const person = {
     name: body.name,
-    number: body.number 
+    number: body.number
   }
-//lol
   Person.findByIdAndUpdate(request.params.id, person, { new: true, runValidators: true, context: 'query' })
     .then(updatedPerson => {
       response.json(updatedPerson)
